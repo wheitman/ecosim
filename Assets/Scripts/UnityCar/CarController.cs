@@ -93,7 +93,7 @@ void FixedUpdate()
 	Debug.Log($"X: {inputX} // Y: {inputY} // R {inputR} // H {inputH}");
 
 	// calculate vehicle velocity in the forward direction
-	vel = transform.InverseTransformDirection(rB.linearVelocity).z;
+	vel = transform.InverseTransformDirection(rB.velocity).z;
 
 	// update aerodynamic drag and lift
 	// aeroDynamics.ApplyAeroDrag(vel);
