@@ -8,7 +8,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Demoland.unity
     guid: fed61ed4744f06d448be21c59433bb52
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Checkerworld.unity
     guid: 461ab6735166e474dbdbe435c5d4f04e
+  - enabled: 1
+    path: Assets/Scenes/Schenley.unity
+    guid: 7a3b49af0fc3b5d4a91b88f12d49b352
   m_configObjects: {}

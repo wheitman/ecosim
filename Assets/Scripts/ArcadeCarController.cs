@@ -90,6 +90,14 @@ void ApplyNetForces()
 
 		if (float.IsNaN(force.x))
 			continue;
+			
+		if (Math.Abs(targetForwardSpeed) < 0.1 && Math.Abs(targetTurnSpeed) < 0.1) {
+			force = new Vector3(0, 0, 0);
+			rigidbody.isKinematic = true;
+			Debug.Log("Car is stopped. Making kinematic.");
+		} else{
+			rigidbody.isKinematic = false;
+		}
 
 		GameObject wheel = rayPoints[i];
 
@@ -153,7 +161,7 @@ private void AddSuspensionForces()
 
 			if (showDebug)
 			{
-				Debug.Log($"Ground is {hit.distance} meters below {rayOrigin.name}. Wheel pushed up {wheelOffset}");
+				// Debug.Log($"Ground is {hit.distance} meters below {rayOrigin.name}. Wheel pushed up {wheelOffset}");
 				Debug.DrawLine(rayOrigin.transform.position, hit.point, Color.magenta);
 			}
 
@@ -216,7 +224,7 @@ private void GetTeleopInput()
 	}
 	targetForwardSpeed = bridge.throttle;
 	targetTurnSpeed = bridge.turn;
-	// Debug.Log($"({throttle}, {turn})");
+	Debug.Log($"({bridge.throttle}, {bridge.turn})");
 }
 
 private void AddThrottle()
