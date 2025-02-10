@@ -75,6 +75,13 @@ void ResetNetForces()
 
 void ApplyNetForces()
 {
+	// if (Math.Abs(targetForwardSpeed) < 0.1) {
+	// 	targetForwardSpeed = 0;
+	// }
+	// if (Math.Abs(targetTurnSpeed) < 0.1) {
+	// 	targetTurnSpeed = 0;
+	// }
+
 	for (int i = 0; i < netForces.Count; i++)
 	{
 		Vector3 force = netForces[i];
@@ -94,7 +101,7 @@ void ApplyNetForces()
 		if (Math.Abs(targetForwardSpeed) < 0.1 && Math.Abs(targetTurnSpeed) < 0.1) {
 			force = new Vector3(0, 0, 0);
 			rigidbody.isKinematic = true;
-			Debug.Log("Car is stopped. Making kinematic.");
+			// Debug.Log("Car is stopped. Making kinematic.");
 		} else{
 			rigidbody.isKinematic = false;
 		}
@@ -224,7 +231,7 @@ private void GetTeleopInput()
 	}
 	targetForwardSpeed = bridge.throttle;
 	targetTurnSpeed = bridge.turn;
-	Debug.Log($"({bridge.throttle}, {bridge.turn})");
+	// Debug.Log($"({bridge.throttle}, {bridge.turn})");
 }
 
 private void AddThrottle()
@@ -300,7 +307,7 @@ private void AddThrottle()
 		rigidbody.AddTorque(transform.up * -1f * turnMultiplier);
 	}
 
-	Debug.Log($"Lin: {targetForwardSpeed - carSpeed}, ang: {targetTurnSpeed - current_turn}");
+	// Debug.Log($"Lin: {targetForwardSpeed - carSpeed}, ang: {targetTurnSpeed - current_turn}");
 
 	// Spin the wheels visually
 	foreach (GameObject wheel in wheels) {
