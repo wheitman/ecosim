@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!114 &1
 MonoBehaviour:
-  m_ObjectHideFlags: 61
+  m_ObjectHideFlags: 53
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -18,7 +18,6 @@ MonoBehaviour:
   m_SeeAllPackageVersions: 0
   m_DismissPreviewPackagesInUse: 0
   oneTimeWarningShown: 0
-  oneTimeDeprecatedPopUpShown: 1
   m_Registries:
   - m_Id: main
     m_Name: 
@@ -32,6 +31,6 @@ MonoBehaviour:
   m_RegistryInfoDraft:
     m_Modified: 0
     m_ErrorMessage: 
-    m_UserModificationsInstanceId: -864
-    m_OriginalInstanceId: -866
+    m_UserModificationsInstanceId: -832
+    m_OriginalInstanceId: -834
   m_LoadAssets: 0
