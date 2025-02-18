@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a14633626ba5d44ab10051ee5c60c22, type: 3}
+  m_Name: UR10 Config
+  m_EditorClassIdentifier: 
+  _frames:
+  - _name: Base
+    _alpha: 0
+    _a: 0
+    _d: 0
+    _theta: 0
+  - _name: Joint_1
+    _alpha: 1.5707964
+    _a: 0
+    _d: 0.1273
+    _theta: 0
+  - _name: Joint_2
+    _alpha: 0
+    _a: -0.612
+    _d: 0
+    _theta: 0
+  - _name: Joint_3
+    _alpha: 0
+    _a: -0.5723
+    _d: 0
+    _theta: 0
+  - _name: Joint_4
+    _alpha: 1.5707964
+    _a: 0
+    _d: 0.163941
+    _theta: 0
+  - _name: Joint_5
+    _alpha: -1.570796
+    _a: 0
+    _d: 0.1157
+    _theta: 0
+  - _name: Joint_6
+    _alpha: 0
+    _a: 0
+    _d: 0.0922
+    _theta: 0
+  - _name: Flange
+    _alpha: 0
+    _a: 0
+    _d: 0
+    _theta: 0
+  _joints:
+  - _name: Joint_1
+    _type: 0
+    _limits: {x: -360, y: 360}
+    _offset: 0
+    _factor: 1
+    _speedMax: 120
+    _accMax: 500
+  - _name: Joint_2
+    _type: 0
+    _limits: {x: -360, y: 360}
+    _offset: 0
+    _factor: 1
+    _speedMax: 120
+    _accMax: 500
+  - _name: Joint_3
+    _type: 0
+    _limits: {x: -360, y: 360}
+    _offset: 0
+    _factor: 1
+    _speedMax: 120
+    _accMax: 500
+  - _name: Joint_4
+    _type: 0
+    _limits: {x: -360, y: 360}
+    _offset: 0
+    _factor: 1
+    _speedMax: 180
+    _accMax: 500
+  - _name: Joint_5
+    _type: 0
+    _limits: {x: -360, y: 360}
+    _offset: 0
+    _factor: 1
+    _speedMax: 180
+    _accMax: 500
+  - _name: Joint_6
+    _type: 0
+    _limits: {x: -360, y: 360}
+    _offset: 0
+    _factor: 1
+    _speedMax: 180
+    _accMax: 500
+  _cartesianLimit:
+    _linearSpeed: 5
+    _linearAcc: 15
+    _rotationSpeed: 180
+    _rotationAcc: 900
