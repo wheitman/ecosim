@@ -1,6 +1,4 @@
-> [!NOTE]  
-> EcoSim is no longer being developed by Will Heitman at Arbor Robotics, as the research project has concluded. This repository has been archived.
-# EcoSim
+![EcoSim logo](logo.png)
 
 ![Screenshot of EcoSim](screenshot.png)
 
@@ -11,3 +9,4 @@ A Unity-based simulator for testing our tree-planting robot. We use the Universa
 - [Unity Terrain - URP Demo Scene](https://assetstore.unity.com/packages/3d/environments/unity-terrain-urp-demo-scene-213197)
 - Ubuntu 22.04
 - ROS2 Humble
+- Unity packages listed in [manifest.json](Packages/manifest.json) (these should be installed automatically)
