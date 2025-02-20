@@ -4,7 +4,7 @@ using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using RosMessageTypes.Sensor;
-using Preliy.Flange;
+// using Preliy.Flange;
 
 public class RosArmInterface : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class RosArmInterface : MonoBehaviour
     // ROS Connector
     ROSConnection m_Ros;
 
-    Robot6ROffsetWrist flangeRobot;
+    // Robot6ROffsetWrist flangeRobot;
     List<string> jointNames;
 
     public float forceLimit;
@@ -41,9 +41,9 @@ public class RosArmInterface : MonoBehaviour
         // Get ROS connection static instance
         m_Ros = ROSConnection.GetOrCreateInstance();
 
-        m_Ros.RegisterPublisher<RosMessageTypes.Sensor.JointStateMsg>("/joint_states");
+        m_Ros.RegisterPublisher<RosMessageTypes.Sensor.JointStateMsg>("/ecosim/joint_states");
 
-        m_Ros.Subscribe<RosMessageTypes.Sensor.JointStateMsg>("/joint_states", HandleJointStateMessage);
+        m_Ros.Subscribe<RosMessageTypes.Sensor.JointStateMsg>("/ecosim/joint_commands", HandleJointStateMessage);
     }
 
 
@@ -62,6 +62,8 @@ public class RosArmInterface : MonoBehaviour
 
 
         armPositionController.SetTargetAngles(angles);
+
+        m_Ros.Publish("/ecosim/joint_states", jointStateMsg);
     }
 
     // Update is called once per frame
