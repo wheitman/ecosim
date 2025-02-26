@@ -95,7 +95,7 @@ public class ArcadeCarController : MonoBehaviour
 		float throttle = Input.GetAxis("Vertical");
 		float turn = Input.GetAxis("Horizontal");
 
-		float speedError = targetForwardSpeed - Vector3.Dot(transform.forward, rigidbody.velocity);
+		float speedError = targetForwardSpeed - Vector3.Dot(transform.forward, rigidbody.linearVelocity);
 		float turnError = targetTurnSpeed - rigidbody.angularVelocity.y;
 
 		// Cap the turn error to the turn speed limit
@@ -104,7 +104,7 @@ public class ArcadeCarController : MonoBehaviour
 
 		// rigidbody.AddForce(transform.forward * 12000 * speedError);
 
-		rigidbody.velocity = transform.forward * targetForwardSpeed;
+		rigidbody.linearVelocity = transform.forward * targetForwardSpeed;
 		rigidbody.angularVelocity = new Vector3(0f, -targetTurnSpeed, 0f);
 
 		// for (int i = 0; i < netForces.Count; i++)
@@ -267,7 +267,7 @@ public class ArcadeCarController : MonoBehaviour
 		// float throttle = Input.GetAxis("Vertical");
 		// float turn = Input.GetAxis("Horizontal");
 
-		float carSpeed = Vector3.Dot(transform.forward, rigidbody.velocity);
+		float carSpeed = Vector3.Dot(transform.forward, rigidbody.linearVelocity);
 
 		// Bang bang baby!
 		if (carSpeed < targetForwardSpeed - 0.1f)
@@ -299,7 +299,7 @@ public class ArcadeCarController : MonoBehaviour
 				if (Math.Abs(throttle) < 0.1f && Math.Abs(turn) < 0.1)
 				{
 					float desiredVelChange;
-					if (rigidbody.velocity.magnitude > .1)
+					if (rigidbody.linearVelocity.magnitude > .1)
 					{
 						forwardGripFactor -= 0.1f;
 					}
