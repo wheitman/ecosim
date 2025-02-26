@@ -101,7 +101,7 @@ namespace ROS2
 
 			// Unity requires us to get our velocity in the main thread-- that's here!
 			// Unity "z" is forward-- ROS's "x". Unity "y" is up-- ROS's "z"
-			current_forward_speed = GetComponent<Rigidbody>().velocity.magnitude;
+			current_forward_speed = GetComponent<Rigidbody>().linearVelocity.magnitude;
 
 			// Negate to make it right-handed
 			current_yaw_rate = -1 * GetComponent<Rigidbody>().angularVelocity.y;
