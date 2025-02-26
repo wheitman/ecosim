@@ -1,4 +1,4 @@
-![EcoSim logo](logo.png)
+![EcoSim logo](Documentation~/assets/images/logo.png)
 
 ![Screenshot of EcoSim](screenshot.png)
 
