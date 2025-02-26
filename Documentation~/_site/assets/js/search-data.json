@@ -1,14 +1,7 @@
 {"0": {
     "doc": "Home",
-    "title": "Building",
-    "content": ". | Clone EcoSim: git clone https://github.com/wheitman/ecosim | Download the Unity Hub and open it | In Unity Hub’s “Projects” tab, click “Add” -&gt; “Add Project from Disk” | Select the root of the EcoSim repository | The Unity Hub will likely prompt you to install the Unity Editor. Select the version it recommends, v6000.0.40f1 (the minor version can vary). | Once the editor is installed, click the “ecosim” project to open it. | . ",
-    "url": "/#building",
-    
-    "relUrl": "/#building"
-  },"1": {
-    "doc": "Home",
     "title": "Home",
-    "content": "EcoSim is a Unity-based farm robotics simulator. ",
+    "content": "Appleseed Labs is a student team at Carnegie Mellon building a reforestation robot for the 2025 Farm Robotics Challenge. You can track our tasks and progress on our GitHub Project page. ",
     "url": "/",
     
     "relUrl": "/"

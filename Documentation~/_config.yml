@@ -1,0 +1,14 @@
+title: EcoSim
+description: A simulator for farm robots
+theme: just-the-docs
+logo: "/assets/images/ecosim-14.svg"
+favicon_ico: "/assets/images/ecosim-14.svg"
+color_scheme: appleseed
+
+url: https://wheitman.github.io/ecosim
+
+nav_external_links:
+  - title: GitHub repo
+    url: https://github.com/wheitman/ecosim
+    hide_icon: false # set to true to hide the external link icon - defaults to false
+    opens_in_new_tab: true # set to true to open this link in a new tab - defaults to false
