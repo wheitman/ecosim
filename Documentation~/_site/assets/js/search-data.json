@@ -1,7 +1,21 @@
 {"0": {
     "doc": "Home",
+    "title": "System requirements",
+    "content": ". | A modern GPU | Windows or Linux (macOS is not officially supported) | . ",
+    "url": "/#system-requirements",
+    
+    "relUrl": "/#system-requirements"
+  },"1": {
+    "doc": "Home",
+    "title": "Installation",
+    "content": ". | Clone EcoSim: git clone https://github.com/wheitman/ecosim | If you haven’t already, download and install the Unity Hub | In Unity Hub’s “Projects” tab, click Add -&gt; Add project from disk. | Click the EcoSim project that you’ve added to open it. | You’ll likely be asked to install the editor version that matches EcoSim (e.g. 6000.0.40f1). Go ahead and do that. | . ",
+    "url": "/#installation",
+    
+    "relUrl": "/#installation"
+  },"2": {
+    "doc": "Home",
     "title": "Home",
-    "content": "Appleseed Labs is a student team at Carnegie Mellon building a reforestation robot for the 2025 Farm Robotics Challenge. You can track our tasks and progress on our GitHub Project page. ",
+    "content": "EcoSim is a simulator for farm robotics. ",
     "url": "/",
     
     "relUrl": "/"

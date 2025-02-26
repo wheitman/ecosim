@@ -22,8 +22,8 @@ public class RosArmInterface : MonoBehaviour
 
     public float forceLimit;
 
-    [SerializeField]
-    Camera gameCamera;
+    // [SerializeField]
+    // Camera gameCamera;
 
     [SerializeField]
     BoxCollider gripperTriggerCollider;
@@ -61,35 +61,35 @@ public class RosArmInterface : MonoBehaviour
 
         // Publish joint states at rate jointStatePublishRateHz
         InvokeRepeating("PublishJointStates", 0.01f, (float)1 / jointStatePublishRateHz);
-        InvokeRepeating("GetMouseTarget", 0.01f, 0.1f);
+        // InvokeRepeating("GetMouseTarget", 0.01f, 0.1f);
     }
 
-    void GetMouseTarget()
-    {
-        if (Input.GetMouseButton(0) == false) return;
+    // void GetMouseTarget()
+    // {
+    //     if (Input.GetMouseButton(0) == false) return;
 
-        Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
+    //     Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
 
-        RaycastHit hit;
+    //     RaycastHit hit;
 
-        LayerMask terrainMask = LayerMask.GetMask("Terrain");
+    //     LayerMask terrainMask = LayerMask.GetMask("Terrain");
 
-        if (Physics.Raycast(ray, out hit, terrainMask))
-        {
-            Debug.DrawLine(transform.position, hit.point, Color.green, 0.1f);
+    //     if (Physics.Raycast(ray, out hit, terrainMask))
+    //     {
+    //         Debug.DrawLine(transform.position, hit.point, Color.green, 0.1f);
 
-            // Debug.Log(hit.point);
-            Vector3 localPoint = transform.InverseTransformPoint(hit.point);
-            // localPoint.z = 0.0f;
-            // Debug.Log($"localPoint = {localPoint}");
+    //         // Debug.Log(hit.point);
+    //         Vector3 localPoint = transform.InverseTransformPoint(hit.point);
+    //         // localPoint.z = 0.0f;
+    //         // Debug.Log($"localPoint = {localPoint}");
 
-            // Send to ROS
-            PointMsg msg = localPoint.To<FLU>();
-            m_Ros.Publish("/ecosim/clicked_point", msg);
-        }
+    //         // Send to ROS
+    //         PointMsg msg = localPoint.To<FLU>();
+    //         m_Ros.Publish("/ecosim/clicked_point", msg);
+    //     }
 
 
-    }
+    // }
 
     void JointCommandCb(JointStateMsg jointCommand)
     {

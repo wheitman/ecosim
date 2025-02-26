@@ -3,7 +3,7 @@ description: A simulator for farm robots
 theme: just-the-docs
 logo: "/assets/images/ecosim-14.svg"
 favicon_ico: "/assets/images/ecosim-14.svg"
-color_scheme: appleseed
+color_scheme: ecosim
 
 url: https://wheitman.github.io/ecosim
 
