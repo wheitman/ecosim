@@ -2,6 +2,10 @@ using System;
 using Unity.Robotics;
 using Unity.Robotics.UrdfImporter.Control;
 using UnityEngine;
+using RosMessageTypes.Sensor;
+using System.Linq;
+using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 
 public enum RotationDirection { None = 0, Positive = 1, Negative = -1 };
@@ -95,6 +99,53 @@ public class ArmPositionController : MonoBehaviour
         // UpdateDirection(selectedIndex);
     }
 
+    public JointStateMsg GetJointStates()
+    {
+        JointStateMsg msg = new();
+
+        List<string> names = new List<string>();
+        List<double> positions = new List<double>();
+        List<double> velocities = new List<double>();
+        List<double> efforts = new List<double>();
+        for (int jointIndex = 0; jointIndex < articulationChain.Length; jointIndex++)
+        {
+
+            JointControl current = articulationChain[jointIndex].GetComponent<JointControl>();
+
+            // Debug.Log(current.joint.xDrive.target);
+            if (current.joint.dofCount != 1) continue; // Only consider joints with 1 DOF
+
+            positions.Add(current.joint.jointPosition[0]);
+            names.Add(current.name);
+            // Debug.Log($"names.Count = {names.Count}");
+
+            velocities.Add(current.joint.jointVelocity[0]);
+            efforts.Add(current.joint.jointForce[0]);
+            // Debug.Log($"{current.name} = {current.joint.jointPosition[0]}");
+        }
+
+        Debug.Assert(names.Count == positions.Count, "Joint names and positions do not have same length");
+
+        if (positions.Count < 0)
+        {
+            Debug.Log("Positions was empty!");
+        }
+        if (names.Count < 0)
+        {
+            Debug.Log("Names was empty!");
+        }
+
+        msg.name = names.ToArray();
+
+        // Debug.Log($"msg.name.Length = {msg.name.Length}");
+
+        msg.position = positions.ToArray();
+        msg.velocity = velocities.ToArray();
+        msg.effort = efforts.ToArray();
+
+        return msg;
+    }
+
     public void SetTargetAngles(double[] targetAngles)
     {
 
@@ -125,7 +176,7 @@ public class ArmPositionController : MonoBehaviour
 
             ArticulationDrive drive = current.joint.xDrive;
 
-            Debug.Log($"{current.name} = {targetAngles[jointIndex]}");
+            // Debug.Log($"{current.name} = {targetAngles[jointIndex]}");
 
             drive.target = (float)targetAngles[jointIndex] * Mathf.Rad2Deg;
             current.joint.xDrive = drive;
