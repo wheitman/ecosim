@@ -73,4 +73,6 @@ crashlytics-build.properties
 /[Aa]ssets/TerrainDemoScene_URP
 /[Aa]ssets/Packages
 /[Aa]ssets/Barrier Pack
-/Packages
+# Packages
+
+!Packages/manifest.json
