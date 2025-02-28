@@ -10,7 +10,7 @@ public class ArcadeCarController : MonoBehaviour
 {
 
 	[SerializeField] bool showDebug;
-	[SerializeField] bool enableManualControl;
+	[SerializeField] bool enableKeyboardControl;
 	[SerializeField] GameObject[] tires;
 	[SerializeField] float wheelRadius;
 	[SerializeField] float suspensionDistance;
@@ -53,7 +53,7 @@ public class ArcadeCarController : MonoBehaviour
 		ROSConnection.GetOrCreateInstance().Subscribe<RosTwist>("cmd_vel", (msg) =>
 		{
 			targetForwardSpeed = (float)msg.linear.x;
-			targetTurnSpeed = (float)msg.angular.z;
+			targetTurnSpeed = (float)msg.angular.z * -1;
 
 			Debug.Log($"Received {targetForwardSpeed}, {targetTurnSpeed}");
 		});
@@ -62,11 +62,11 @@ public class ArcadeCarController : MonoBehaviour
 	void FixedUpdate()
 	{
 
-		// if (enableManualControl)
-		GetKeyboardInput();
+		if (enableKeyboardControl)
+			GetKeyboardInput();
 
-		if (targetForwardSpeed == 0 && targetTurnSpeed == 0)
-			return;
+		// if (targetForwardSpeed == 0 && targetTurnSpeed == 0)
+		// 	return;
 		// else
 		// 	GetTeleopInput();
 		VisualizeWheelAxes();
