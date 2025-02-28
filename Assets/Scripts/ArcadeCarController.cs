@@ -11,22 +11,21 @@ public class ArcadeCarController : MonoBehaviour
 
 	[SerializeField] bool showDebug;
 	[SerializeField] bool enableManualControl;
-	[SerializeField] GameObject[] rayPoints;
-	[SerializeField] GameObject[] wheels;
+	[SerializeField] GameObject[] tires;
 	[SerializeField] float wheelRadius;
 	[SerializeField] float suspensionDistance;
-	[SerializeField] float springFactor;     // 0 to 1
 	[SerializeField] float springDamper;
-	[SerializeField] float sideGridFactor;     // 0 to 1. How much the tire resists slip in the side direction.
+	[SerializeField] float tireGripFactor;     // 0 to 1. How much the tire resists slip in the side direction.
 	[SerializeField] float forwardGripFactor;     // 0 to 1. How much the tire resists slip in the forward direction.
 	[SerializeField] float tireMass;
 	[SerializeField] float distanceFromWheelToEgoCenter;
 	[SerializeField] float mass;
 	[SerializeField] float throttleMultiplier;
-	[SerializeField] float turnMultiplier;
 	[SerializeField] float speedLimit;     // m/s
-	[SerializeField] float turnSpeedLimit;
 	[SerializeField] float forceLimit;     // N
+	[SerializeField] float torqueLimit;    // Nm
+	[SerializeField] float turnKp;
+	[SerializeField] float forwardKp;
 
 	float throttle = 0f;
 	public float targetForwardSpeed = 0f;
@@ -38,14 +37,14 @@ public class ArcadeCarController : MonoBehaviour
 
 	private List<Vector3> netForces;
 
-	new Rigidbody rigidbody;
+	private ArticulationBody articulationBody;
+
 	WebsocketBridge bridge;
 
-	// Start is called before the first frame update
 	void Start()
 	{
-		rigidbody = GetComponent<Rigidbody>();
-		rigidbody.mass = mass;
+		articulationBody = GetComponent<ArticulationBody>();
+		articulationBody.mass = mass;
 
 		springStrength = mass * 9.8f / 4.0f / (suspensionDistance / 2);
 
@@ -62,18 +61,19 @@ public class ArcadeCarController : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		ResetNetForces();
 
 		// if (enableManualControl)
-		// 	GetKeyboardInput();
+		GetKeyboardInput();
+
+		if (targetForwardSpeed == 0 && targetTurnSpeed == 0)
+			return;
 		// else
 		// 	GetTeleopInput();
-		// VisualizeWheelAxes();
+		VisualizeWheelAxes();
 		// VisualizeRaycasts();
-		// AddSuspensionForces();
+		AddSuspensionForces();
 		AddSteeringForces();
-		// AddThrottle();
-		ApplyNetForces();
+		AddThrottle();
 		VisualizeNetForces();
 	}
 
@@ -85,67 +85,34 @@ public class ArcadeCarController : MonoBehaviour
 
 	void ApplyNetForces()
 	{
-		// if (Math.Abs(targetForwardSpeed) < 0.1) {
-		// 	targetForwardSpeed = 0;
-		// }
-		// if (Math.Abs(targetTurnSpeed) < 0.1) {
-		// 	targetTurnSpeed = 0;
-		// }
 
-		float throttle = Input.GetAxis("Vertical");
-		float turn = Input.GetAxis("Horizontal");
+		for (int i = 0; i < netForces.Count; i++)
+		{
+			Vector3 force = netForces[i];
 
-		float speedError = targetForwardSpeed - Vector3.Dot(transform.forward, rigidbody.linearVelocity);
-		float turnError = targetTurnSpeed - rigidbody.angularVelocity.y;
-
-		// Cap the turn error to the turn speed limit
-		turnError = Math.Min(turnError, turnSpeedLimit);
-		turnError = Math.Max(turnError, -turnSpeedLimit);
-
-		// rigidbody.AddForce(transform.forward * 12000 * speedError);
-
-		rigidbody.linearVelocity = transform.forward * targetForwardSpeed;
-		rigidbody.angularVelocity = new Vector3(0f, -targetTurnSpeed, 0f);
-
-		// for (int i = 0; i < netForces.Count; i++)
-		// 	{
-		// 		Vector3 force = netForces[i];
-
-		// 		float magnitude = force.magnitude;
+			float magnitude = force.magnitude;
 
 
-		// 		// Apply force limits
-		// 		force /= magnitude;
-		// 		magnitude = Math.Min(forceLimit, magnitude);
-		// 		magnitude = Math.Max(-forceLimit, magnitude);
-		// 		force *= magnitude;
+			// Apply force limits
+			force /= magnitude;
+			magnitude = Mathf.Clamp(magnitude, -forceLimit, forceLimit);
+			force *= magnitude;
 
-		// 		if (float.IsNaN(force.x))
-		// 			continue;
+			if (float.IsNaN(force.x))
+				continue;
 
-		// 		if (Math.Abs(targetForwardSpeed) < 0.1 && Math.Abs(targetTurnSpeed) < 0.1)
-		// 		{
-		// 			force = new Vector3(0, 0, 0);
-		// 			rigidbody.isKinematic = true;
-		// 			// Debug.Log("Car is stopped. Making kinematic.");
-		// 		}
-		// 		else
-		// 		{
-		// 			rigidbody.isKinematic = false;
-		// 		}
+			GameObject wheel = tires[i];
 
-		// 		GameObject wheel = rayPoints[i];
+			articulationBody.AddForceAtPosition(force, wheel.transform.position);
 
-		// 		rigidbody.AddForceAtPosition(force, wheel.transform.position);
-
-		// 	}
+		}
 	}
 
 	void VisualizeNetForces(float scale = 0.002f)
 	{
-		for (int i = 0; i < rayPoints.Length; i++)
+		for (int i = 0; i < tires.Length; i++)
 		{
-			GameObject wheel = rayPoints[i];
+			GameObject wheel = tires[i];
 			Vector3 force = netForces[i];
 
 			if (showDebug)
@@ -155,22 +122,22 @@ public class ArcadeCarController : MonoBehaviour
 
 	void VisualizeWheelAxes()
 	{
-		foreach (GameObject wheel in rayPoints)
+		foreach (GameObject tire in tires)
 		{
-			Vector3 start = wheel.transform.position;
+			Vector3 start = tire.transform.position;
 
 			// x axis in red
-			Vector3 end = wheel.transform.position;
+			Vector3 end = tire.transform.position;
 			end.x += 1;
 			Debug.DrawLine(start, end, Color.red);
 
 			// y axis in green
-			end = wheel.transform.position;
+			end = tire.transform.position;
 			end.y += 1;
 			Debug.DrawLine(start, end, Color.green);
 
 			// z axis in blue
-			end = wheel.transform.position;
+			end = tire.transform.position;
 			end.z += 1;
 			Debug.DrawLine(start, end, Color.blue);
 		}
@@ -178,62 +145,70 @@ public class ArcadeCarController : MonoBehaviour
 
 	private void AddSuspensionForces()
 	{
-		for (int i = 0; i < rayPoints.Length; i++)
+		for (int i = 0; i < tires.Length; i++)
 		{
+			GameObject tire = tires[i];
 
-			GameObject rayOrigin = rayPoints[i];
-			GameObject wheel = wheels[i];
-
-			// Shoot a ray down
-
+			// Cast raypoint down from wheel
 			RaycastHit hit;
+			Vector3 rayOrigin = tire.transform.position;
+			Vector3 rayDirection = -tire.transform.up;
+			bool hitGround = Physics.Raycast(rayOrigin, rayDirection, out hit, wheelRadius + suspensionDistance);
 
-			float wheelRestDistance = wheelRadius + suspensionDistance;
+			if (!hitGround)
+				continue;
 
-			if (Physics.Raycast(rayOrigin.transform.position, -Vector3.up, out hit, wheelRestDistance))
-			{
-				float wheelOffset = hit.distance - wheelRestDistance;
+			Vector3 springDir = tire.transform.up;
+			Vector3 tireWorldVel = articulationBody.GetPointVelocity(tire.transform.position);
+			float offset = suspensionDistance - hit.distance;
+			float springVelocity = Vector3.Dot(springDir, tireWorldVel);
+			float springForce = springStrength * offset - springDamper * springVelocity;
 
-				if (showDebug)
-				{
-					// Debug.Log($"Ground is {hit.distance} meters below {rayOrigin.name}. Wheel pushed up {wheelOffset}");
-					Debug.DrawLine(rayOrigin.transform.position, hit.point, Color.magenta);
-				}
+			articulationBody.AddForceAtPosition(springDir * springForce, tire.transform.position);
 
-				Vector3 wheelWorldVel = rigidbody.GetPointVelocity(rayOrigin.transform.position);
-
-				float offset = wheelRestDistance - hit.distance;
-				float vel = Vector3.Dot(rayOrigin.transform.up, wheelWorldVel);
-
-				float force = (offset * springStrength) - (vel * springDamper);
-
-				netForces[i] += rayOrigin.transform.up * force;
-
-				Vector3 wheelPosition = hit.point;
-				wheelPosition.y += wheelRadius;
-				wheel.transform.position = wheelPosition;
-			}
+			if (showDebug)
+				Debug.DrawLine(tire.transform.position, tire.transform.position + springDir * springForce, Color.blue);
 		}
 	}
 
 	private void AddSteeringForces()
 	{
-		for (int i = 0; i < rayPoints.Length; i++)
+
+		// Add torque to reach desired turn speed
+		float currentTurnSpeed = articulationBody.angularVelocity.y;
+		float turnError = targetTurnSpeed - currentTurnSpeed;
+		// Calculate desired torque from turn error, current torque
+		float desiredTorque = turnError * articulationBody.mass * turnKp;
+
+		if (Mathf.Abs(desiredTorque) > torqueLimit)
+			Debug.LogWarning($"Desired torque {desiredTorque} exceeds limit {torqueLimit}");
+
+		desiredTorque = Mathf.Clamp(desiredTorque, -torqueLimit, torqueLimit);
+		articulationBody.AddTorque(Vector3.up * desiredTorque);
+
+		Debug.Log($"Turn error: {turnError}, Desired torque: {desiredTorque}");
+
+		for (int i = 0; i < tires.Length; i++)
 		{
-			GameObject wheel = rayPoints[i];
+			GameObject tire = tires[i];
 
-			Vector3 wheelWorldVel = rigidbody.GetPointVelocity(wheel.transform.position);
+			// Cast raypoint down from wheel
+			RaycastHit hit;
+			Vector3 rayOrigin = tire.transform.position;
+			Vector3 rayDirection = -tire.transform.up;
+			bool hitGround = Physics.Raycast(rayOrigin, rayDirection, out hit, wheelRadius + suspensionDistance);
 
-			// Direction we don't want to wheel to roll in.
-			Vector3 slipDirection = wheel.transform.right;
+			if (!hitGround)
+				continue;
 
-			float slipVel = Vector3.Dot(slipDirection, wheelWorldVel);
+			Vector3 steeringDir = tire.transform.right;
+			Vector3 tireWorldVel = articulationBody.GetPointVelocity(tire.transform.position);
+			float steeringSpeed = Vector3.Dot(steeringDir, tireWorldVel);
+			float desiredSpeedChange = -steeringSpeed * tireGripFactor;
+			float desiredAccel = desiredSpeedChange / Time.fixedDeltaTime;
 
-			float desiredVelChange = -slipVel * sideGridFactor;
+			articulationBody.AddForceAtPosition(steeringDir * tireMass * desiredAccel, tire.transform.position);
 
-			float desiredAcceleration = desiredVelChange / Time.fixedDeltaTime;
-
-			netForces[i] += slipDirection * tireMass * desiredAcceleration;
 		}
 	}
 
@@ -245,103 +220,37 @@ public class ArcadeCarController : MonoBehaviour
 		targetTurnSpeed = turn;
 	}
 
-	private void GetTeleopInput()
-	{
-		if (throttle > 1)
-		{
-			Debug.LogWarning($"Throttle of {throttle} was greater than 1. Ignoring");
-			throttle = 0f;
-		}
-		else if (throttle < -1)
-		{
-			Debug.LogWarning($"Throttle of {throttle} was smaller than -1. Ignoring.");
-			throttle = 0f;
-		}
-		targetForwardSpeed = bridge.throttle;
-		targetTurnSpeed = bridge.turn;
-		// Debug.Log($"({bridge.throttle}, {bridge.turn})");
-	}
-
 	private void AddThrottle()
 	{
-		// float throttle = Input.GetAxis("Vertical");
-		// float turn = Input.GetAxis("Horizontal");
-
-		float carSpeed = Vector3.Dot(transform.forward, rigidbody.linearVelocity);
-
-		// Bang bang baby!
-		if (carSpeed < targetForwardSpeed - 0.1f)
+		for (int i = 0; i < tires.Length; i++)
 		{
-			throttle = 1f;
-		}
-		else if (carSpeed > targetForwardSpeed + 0.1f)
-		{
-			throttle = -1f;
-		}
+			GameObject tire = tires[i];
 
-		if (carSpeed > speedLimit && throttle >= 0f)
-		{
-			if (showDebug)
-				Debug.Log("Car at speed limit. Coasting.");
-		}
-		else
-		{
-			for (int i = 0; i < rayPoints.Length; i++)
-			{
-				GameObject wheel = rayPoints[i];
+			// Cast raypoint down from wheel
+			RaycastHit hit;
+			Vector3 rayOrigin = tire.transform.position;
+			Vector3 rayDirection = -tire.transform.up;
+			bool hitGround = Physics.Raycast(rayOrigin, rayDirection, out hit, wheelRadius + suspensionDistance);
 
-				Vector3 accelDir = wheel.transform.forward;
-				Vector3 wheelWorldVel = rigidbody.GetPointVelocity(wheel.transform.position);
+			if (!hitGround)
+				continue;
 
-				float wheelForwardSpeed = Vector3.Dot(accelDir, wheelWorldVel);
+			// Apply force to the articulation body at the tire's position to make the car's forward speed zero
+			Vector3 forwardDir = tire.transform.forward;
+			Vector3 tireWorldVel = articulationBody.GetPointVelocity(tire.transform.position);
+			float forwardSpeed = Vector3.Dot(forwardDir, tireWorldVel);
+			float speedError = targetForwardSpeed - forwardSpeed;
+			Debug.Log($"Speed error: {speedError}");
+			float forwardForce = tireMass * speedError * forwardKp;
 
-				// Apply brakes
-				if (Math.Abs(throttle) < 0.1f && Math.Abs(turn) < 0.1)
-				{
-					float desiredVelChange;
-					if (rigidbody.linearVelocity.magnitude > .1)
-					{
-						forwardGripFactor -= 0.1f;
-					}
-					else
-					{
-						forwardGripFactor += 0.1f;
-					}
-					forwardGripFactor = Math.Min(0f, forwardGripFactor);
-					forwardGripFactor = Math.Max(5f, forwardGripFactor);
-					desiredVelChange = -wheelForwardSpeed * forwardGripFactor;
-					float desiredSlipAcceleration = desiredVelChange / Time.fixedDeltaTime;
-					netForces[i] += accelDir * tireMass * desiredSlipAcceleration;
-				}
+			if (Mathf.Abs(forwardForce) > forceLimit)
+				Debug.LogWarning($"Desired torque {forwardForce} exceeds limit {forceLimit}");
 
+			forwardForce = Mathf.Clamp(forwardForce, -forceLimit, forceLimit);
 
+			// Apply force to the articulation body at the tire's position
+			articulationBody.AddForceAtPosition(forwardDir * forwardForce, tire.transform.position);
 
-				netForces[i] += accelDir * throttle * throttleMultiplier;
-
-			}
-		}
-
-		float current_turn = rigidbody.angularVelocity.y;
-		if (Mathf.Abs(targetTurnSpeed) < 0.01f)
-		{
-			// Do nothing
-		}
-		else if (current_turn < targetTurnSpeed)
-		{
-			rigidbody.AddTorque(transform.up * 1f * turnMultiplier);
-		}
-		else if (current_turn > targetTurnSpeed)
-		{
-			rigidbody.AddTorque(transform.up * -1f * turnMultiplier);
-		}
-
-		// Debug.Log($"Lin: {targetForwardSpeed - carSpeed}, ang: {targetTurnSpeed - current_turn}");
-
-		// Spin the wheels visually
-		foreach (GameObject wheel in wheels)
-		{
-			float wheel_angular_vel = (carSpeed + distanceFromWheelToEgoCenter * current_turn) / wheelRadius;
-			wheel.transform.Rotate(new Vector3(0f, wheel_angular_vel));
 		}
 	}
 
