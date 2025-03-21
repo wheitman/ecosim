@@ -3,7 +3,10 @@ title: Home
 layout: home
 ---
 
-**EcoSim** is a simulator for farm robotics.
+
+**EcoSim** is a simulator for farm robotics, perfectly integrated with ROS2.
+
+![Screenshot of EcoSim](assets\images\ecosim_screenshot_with_rviz2_lidar.png)
 
 ## System requirements
 - A modern GPU
