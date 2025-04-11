@@ -186,7 +186,7 @@ public class ArcadeCarController : MonoBehaviour
 		desiredTorque = Mathf.Clamp(desiredTorque, -torqueLimit, torqueLimit);
 		articulationBody.AddTorque(Vector3.up * desiredTorque);
 
-		Debug.Log($"Turn error: {turnError}, Desired torque: {desiredTorque}");
+		// Debug.Log($"Turn error: {turnError}, Desired torque: {desiredTorque}");
 
 		for (int i = 0; i < tires.Length; i++)
 		{
@@ -240,7 +240,7 @@ public class ArcadeCarController : MonoBehaviour
 			Vector3 tireWorldVel = articulationBody.GetPointVelocity(tire.transform.position);
 			float forwardSpeed = Vector3.Dot(forwardDir, tireWorldVel);
 			float speedError = targetForwardSpeed - forwardSpeed;
-			Debug.Log($"Speed error: {speedError}");
+			// Debug.Log($"Speed error: {speedError}");
 			float forwardForce = tireMass * speedError * forwardKp;
 
 			if (Mathf.Abs(forwardForce) > forceLimit)
