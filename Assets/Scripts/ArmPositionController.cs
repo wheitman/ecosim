@@ -116,7 +116,10 @@ public class ArmPositionController : MonoBehaviour
             if (current.joint.dofCount != 1) continue; // Only consider joints with 1 DOF
 
             positions.Add(current.joint.jointPosition[0]);
-            names.Add(current.name);
+
+            string name = current.name;
+            name = name.Replace("link", "joint");
+            names.Add(name);
             // Debug.Log($"names.Count = {names.Count}");
 
             velocities.Add(current.joint.jointVelocity[0]);

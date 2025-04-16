@@ -4,10 +4,13 @@ using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.ROSGeometry;
 using RosMessageTypes.Sensor;
+using RosMessageTypes.Std;
 using System;
 using RosMessageTypes.Geometry;
 using UnityEngine.Rendering;
 using Unity.VisualScripting;
+using RosMessageTypes.BuiltinInterfaces;
+using RosMessageTypes.Tf2;
 // using Preliy.Flange;
 
 public class RosArmInterface : MonoBehaviour
@@ -33,10 +36,14 @@ public class RosArmInterface : MonoBehaviour
 
     ArmPositionController armPositionController;
 
+    TimeMsg currentTime = new TimeMsg();
+
     // Start is called before the first frame update
     void Start()
     {
         armPositionController = GetComponent<ArmPositionController>();
+
+
 
         // Set up the articulation chain
         articulationChain = this.GetComponentsInChildren<ArticulationBody>();
@@ -54,10 +61,11 @@ public class RosArmInterface : MonoBehaviour
         // Get ROS connection static instance
         m_Ros = ROSConnection.GetOrCreateInstance();
 
-        m_Ros.RegisterPublisher<JointStateMsg>("/joint_states");
+        m_Ros.RegisterPublisher<JointStateMsg>("/arm_joint_states");
         m_Ros.RegisterPublisher<RosMessageTypes.Geometry.PointMsg>("/ecosim/clicked_point");
 
         m_Ros.Subscribe<JointStateMsg>("/joint_commands", JointCommandCb);
+        m_Ros.Subscribe<TFMessageMsg>("/tf", TransformCb);
 
         // Publish joint states at rate jointStatePublishRateHz
         InvokeRepeating("PublishJointStates", 0.01f, (float)1 / jointStatePublishRateHz);
@@ -91,6 +99,13 @@ public class RosArmInterface : MonoBehaviour
 
     // }
 
+    void TransformCb(TFMessageMsg tfMessage)
+    {
+        // Debug.Log("TransformCb called");
+
+        currentTime = tfMessage.transforms[0].header.stamp;
+    }
+
     void JointCommandCb(JointStateMsg jointCommand)
     {
 
@@ -107,15 +122,16 @@ public class RosArmInterface : MonoBehaviour
 
         armPositionController.SetTargetAngles(angles);
 
-        // m_Ros.Publish("/ecosim/joint_states", jointCommand);
+        // m_Ros.Publish("/ecosim/joint_state", jointCommand);
     }
 
     void PublishJointStates()
     {
         JointStateMsg msg = armPositionController.GetJointStates();
         // JointStateMsg msg = new();
+        msg.header.stamp = currentTime;
 
-        m_Ros.Publish("/joint_states", msg);
+        m_Ros.Publish("/arm_joint_states", msg);
     }
 
     // Update is called once per frame
